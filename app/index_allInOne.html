@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Praxisstellen - Hochschule Bochum Vermessung</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- bootstrap dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-uWxY/CJNBR+1zjPWmfnSnVxwRheevXITnMqoEIeG1LJrdI0GlVs/9cVSyPYXdcSF" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ"
+        crossorigin="anonymous"></script>
+
+    <!-- FONTAWESOME -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        crossorigin="" />
+
+    <!-- leaflet dependencies -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" crossorigin="" />
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js" crossorigin=""></script>
+
+    <!-- leaflet markercluster -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" crossorigin=""></script>
+
+    <!-- leaflet search -->
+    <script src="https://unpkg.com/leaflet-search@3.0.2/dist/leaflet-search.min.js" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-search@3.0.3/dist/leaflet-search.min.css" crossorigin="" />
+
+
+
+    <!-- own stylesheet -->
+    <link rel="stylesheet" type="text/css" href="./css/map.css">
+
+    <!-- own stylesheet -->
+    <style>
+        #mapContainer {
+            height: 100vH;
+        }
+
+        .red {
+            color: #E2001A;
+        }
+
+        .green {
+            color: green;
+        }
+
+        .blue {
+            color: #146EBE;
+        }
+
+        .white {
+            color: white;
+        }
+
+        .icon {
+
+            width: 15px;
+            height: 15px;
+            float: left;
+            margin-right: 5px;
+            margin-top: 2px;
+        }
+
+        .icon-blue {
+            color: #146EBE;
+            background-color: #146EBE;
+            background: #146EBE;
+        }
+
+        .icon-red {
+            color: #E2001A;
+            background-color: #E2001A;
+            background: #E2001A;
+        }
+
+        .icon-green {
+            color: green;
+            background-color: green;
+            background: green;
+        }
+
+        .bg-blue {
+            color: antiquewhite;
+            background-color: rgba(20, 110, 190, 0.6) !important;
+            background: rgba(20, 110, 190, 0.6) !important;
+        }
+
+        .bg-green {
+            color: antiquewhite;
+            background-color: rgba(0, 128, 0, 0.6) !important;
+            background: rgba(0, 128, 0, 0.6) !important;
+        }
+
+        .bg-red {
+            color: antiquewhite;
+            background-color: rgba(226, 0, 26, 0.6) !important;
+            background: rgba(226, 0, 26, 0.6) !important;
+        }
+
+        .featurePropertyPopupContent {
+            font-size: 11px;
+            max-width: 300px;
+            max-height: 300px;
+            overflow: auto;
+        }
+
+
+        /* TOGGLE SWITCH */
+
+        /* The switch - the box around the slider */
+
+        #clusterToggle {
+            position: absolute;
+            top: 10px;
+            left: 100px;
+            z-index: 9999;
+            color: #ccc;
+            background-color: rgba(233, 233, 233, 0.5);
+            color: black;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+
+
+
+</head>
+
+<body>
+
+    <!-- empty map container div - will be filled later as interactive map -->
+
+    <div id="mapContainer"></div>
+
+    <div id="clusterToggle">
+        <b><i>Punktmarker clustern? &nbsp;&nbsp;</i></b>
+        <label class="switch">
+            <input type="checkbox" id="clusterToggleSwitch">
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <!-- own javascript -->
+    <script>
+       var mapContainerNodeId = "mapContainer";
+var linkToJsonFile = "./resources/praxis.json";
+// var linkToJsonFile = "http://localhost:8000/resources/praxis.json";
+var useCluster = true;
+var clusterToggleSwitchId = "clusterToggleSwitch";
+
+const study_surveilling = "Vermessung";
+const study_geoinformatics = "Geoinformatik";
+const property_company = "Firma";
+const moodlePageId = "moodlePageId";
+const moodlePageId_label = "Weitere Informationen";
+const moodlePageId_baseUrl = "https://moodle.hs-bochum.de/mod/page/view.php?id=";
+const property_postcode = "PLZ";
+const property_street = "Straße";
+const property_city = "Ort";
+const property_address = "Adresse";
+
+const style_class_surveilling = "blue"; // red, green, blue
+const style_class_geoinformatics = "green"; // red, green, blue
+const style_class_careerDay = "red"; // red, green, blue
+
+const label_layer_surveilling = "Praxisstellen - Studiengang Vermessung " + "<i class='icon icon-" + style_class_surveilling + "'></i>";
+const label_layer_geoinformatics = "Praxisstellen - Studiengang Geoinformatik " + "<i class='icon icon-" + style_class_geoinformatics + "'></i>";
+const label_layer_careerDay = "Praxisstellen - Career Day " + "<i class='icon icon-" + style_class_careerDay + "'></i>";
+
+var overlayLayersArray = [];
+
+var map;
+var layerControl;
+var searchControl;
+
+const MultipleResultsLeafletSearch = L.Control.Search.extend({
+
+    _makeUniqueKey: function (featureName) {
+        return featureName;
+    },
+
+    _searchInLayer: function (layer, retRecords, propName) {
+        var self = this, loc;
+        var key_withUniqueID;
+
+        if (layer instanceof L.Control.Search.Marker) return;
+
+        if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+            if (self._getPath(layer.options, propName)) {
+                loc = layer.getLatLng();
+                loc.layer = layer;
+                retRecords[self._getPath(layer.options, propName)] = loc;
+            }
+            else if (self._getPath(layer.feature.properties, propName)) {
+                loc = layer.getLatLng();
+                loc.layer = layer;
+                key_withUniqueID = this._makeUniqueKey(self._getPath(layer.feature.properties, propName));
+                retRecords[key_withUniqueID] = loc;
+            }
+            else {
+                //throw new Error("propertyName '"+propName+"' not found in marker");
+                console.warn("propertyName '" + propName + "' not found in marker");
+            }
+        }
+        else if (layer instanceof L.Path || layer instanceof L.Polyline || layer instanceof L.Polygon) {
+            if (self._getPath(layer.options, propName)) {
+                loc = layer.getBounds().getCenter();
+                loc.layer = layer;
+                retRecords[self._getPath(layer.options, propName)] = loc;
+            }
+            else if (self._getPath(layer.feature.properties, propName)) {
+                loc = layer.getBounds().getCenter();
+                loc.layer = layer;
+                key_withUniqueID = this._makeUniqueKey(self._getPath(layer.feature.properties, propName));
+                retRecords[key_withUniqueID] = loc;
+            }
+            else {
+                //throw new Error("propertyName '"+propName+"' not found in shape");
+                console.warn("propertyName '" + propName + "' not found in shape");
+            }
+        }
+        else if (layer.hasOwnProperty('feature'))//GeoJSON
+        {
+            if (layer.feature.properties.hasOwnProperty(propName)) {
+
+                key_withUniqueID = this._makeUniqueKey(self._getPath(layer.feature.properties, propName));
+                if (layer.getLatLng && typeof layer.getLatLng === 'function') {
+                    loc = layer.getLatLng();
+                    loc.layer = layer;
+                    retRecords[key_withUniqueID] = loc;
+                } else if (layer.getBounds && typeof layer.getBounds === 'function') {
+                    loc = layer.getBounds().getCenter();
+                    loc.layer = layer;
+                    retRecords[key_withUniqueID] = loc;
+                } else {
+                    console.warn("Unknown type of Layer");
+                }
+            }
+            else {
+                //throw new Error("propertyName '"+propName+"' not found in feature");
+                console.warn("propertyName '" + propName + "' not found in feature");
+            }
+        }
+        else if (layer instanceof L.LayerGroup) {
+            layer.eachLayer(function (layer) {
+                self._searchInLayer(layer, retRecords, propName);
+            });
+        }
+    },
+    _defaultMoveToLocation: function (latlng, title, map) {
+        if (this.options.zoom)
+            this._map.setView(latlng, this.options.zoom);
+        else
+            this._map.panTo(latlng);
+
+        // add collapse after click on item
+        this.collapse();
+    },
+    _handleAutoresize: function () {
+        var maxWidth;
+
+        if (!this._map) {
+            this._map = map;
+        }
+
+        if (this._input.style.maxWidth !== this._map._container.offsetWidth) {
+            maxWidth = this._map._container.clientWidth;
+
+            // other side margin + padding + width border + width search-button + width search-cancel
+            maxWidth -= 10 + 20 + 1 + 30 + 22;
+
+            this._input.style.maxWidth = maxWidth.toString() + 'px';
+        }
+
+        if (this.options.autoResize && (this._container.offsetWidth + 20 < this._map._container.offsetWidth)) {
+            this._input.size = this._input.value.length < this._inputMinSize ? this._inputMinSize : this._input.value.length;
+        }
+    }
+});
+
+function updateSearchControl () {
+
+    setTimeout(function () {
+      if (searchControl) {
+        try {
+          map.removeControl(searchControl);
+          searchControl = undefined;
+        }
+        catch (error) {
+          console.error(error);
+        }
+      }
+
+      // build L.layerGroup of available POI layers
+      var featureLayers = [];
+
+      for (var layerEntry of layerControl._layers) {
+        if (layerEntry) {
+          if (layerEntry.overlay) {
+            if (map.hasLayer(layerEntry.layer)) {
+                featureLayers.push(layerEntry.layer);
+            }
+
+          }
+        }
+      }
+
+      var layerGroup;
+      // if no relevant layers are currently displayed, then
+      if (featureLayers.length === 0) {
+        searchControl = new MultipleResultsLeafletSearch({
+        });
+        searchControl.addTo(map);
+      }
+      else {
+        layerGroup = L.featureGroup(featureLayers);
+
+        searchControl = new MultipleResultsLeafletSearch({
+          position: "topleft",
+          layer: layerGroup,
+          initial: false,
+          propertyName: property_company,
+          textPlaceholder: "Firmen nach Name und Eigenschaften filtern",
+          textCancel: "Abbrechen",
+          textErr: "Position nicht gefunden",
+          hideMarkerOnCollapse: true,
+          zoom: 15,
+          autoResize: true,
+          autoCollapse: false,
+          autoType: true,
+          formatData: function (json) {	//adds coordinates to name.
+            var propName = this.options.propertyName,
+              propLoc = this.options.propertyLoc,
+              i, jsonret = {};
+            if (L.Util.isArray(propLoc))
+              for (i in json) {
+                if (!this._getPath(json[i], propName)) continue;
+                jsonret[this._getPath(json[i], propName) + " (" + json[i][propLoc[0]] + "," + json[i][propLoc[1]] + ")"] = L.latLng(json[i][propLoc[0]], json[i][propLoc[1]]);
+              }
+            else
+              for (i in json) {
+                if (!this._getPath(json[i], propName)) continue;
+                jsonret[this._getPath(json[i], propName) + " (" + json[i][propLoc][0] + "," + json[i][propLoc][1] + ")"] = L.latLng(this._getPath(json[i], propLoc));
+              }
+            return jsonret;
+          },
+          filterData: function (text, records) {
+            var I, icase, regSearch, frecords = {};
+
+            text = text.replace(/[.*+?^${}()|[\]\\]/g, '');  //sanitize remove all special characters
+            if (text === '')
+              return [];
+
+            I = this.options.initial ? '^' : '';  //search only initial text
+            icase = !this.options.casesensitive ? 'i' : undefined;
+
+            regSearch = new RegExp(I + text, icase);
+
+            for (var key in records) {
+
+              // make a searchable string from all relevant feature properties
+              let recordString = "";
+              let record = records[key];
+              let recordProperties = record.layer.feature.properties;
+
+              for (const propertyKey in recordProperties) {
+                if(recordProperties[propertyKey]){
+                  recordString += recordProperties[propertyKey];
+                }
+              }
+
+              if (regSearch.test(recordString))
+                frecords[key] = records[key];
+            }
+
+            return frecords;
+          },
+          buildTip: function (text, val) {
+            var emString = "";
+
+            if (val.layer.feature) {
+              if (val.layer.styleClass) {
+                emString += '<i style="width:14px;height:14px;float:left;" class="icon icon-' + val.layer.styleClass + '">';
+                emString += '</i>';
+              }
+            }
+            else {
+              emString += "<i style='font-size:1.0em;' class='fas fa-sitemap'></i>";
+            }
+            return '<a href="" class="search-tip">' + emString + '&nbsp;&nbsp;' + text + '</a>';
+          }
+        });
+
+        searchControl.addTo(map);
+      }
+    }, 200);
+  };
+
+function initControls() {
+
+    if (map) {
+        // zoom control as default
+
+        // attribution control - static suffix
+        map.attributionControl.addAttribution("Hochschule Bochum");
+
+        // scale control
+        L.control.scale(
+            { maxWidth: 500, metric: true, imperial: false }
+        ).addTo(map);
+
+        // layerControl
+        var baseLayers = {};
+        var overlayLayers = {};
+        layerControl = L.control.layers(baseLayers, overlayLayers);
+        layerControl.addTo(map);
+
+        /////////////////////////////////////////////////////
+        ///// LEAFLET SEARCH SETUP
+        /////////////////////////////////////////////////////
+        // will be updated once example indicator layer is loaded
+        searchControl = new MultipleResultsLeafletSearch({
+        });
+        searchControl.addTo(map);
+    }
+
+}
+
+function initBackgroundLayers() {
+
+    if (map && layerControl) {
+        // specify all background WMS layers
+        // only OSM as active layer
+
+        // start layer
+
+        var osmLayer_tiled =
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                { attribution: 'OSMTiles' }).addTo(map);
+
+        // add baseLayers to Base Layers in layer control
+        layerControl.addBaseLayer(osmLayer_tiled, "Open Street Map");
+    }
+}
+
+function onEachFeature(feature, layer) {
+    if (feature.properties) {
+        let html = "<div class='table-responsive'><table class='table table-striped table-sm'>";
+
+        html += "<thead>"
+
+        html += "<tr>";
+        html += "<th><b>Attributname</b></th>"
+        html += "<th><b>Wert</b></th>"
+        html += "</tr>";
+
+        html += "</thead>"
+        html += "<tbody>"
+
+        for (const key in feature.properties) {
+            if (Object.hasOwnProperty.call(feature.properties, key)) {
+                const element = feature.properties[key];
+                html += "<tr>";
+                html += "<td>" + key + "</td>"
+                html += "<td>" + element + "</td>"
+                html += "</tr>";
+            }
+        }
+
+        html += "</tbody>"
+        html += "</table></div>";
+
+        layer.bindPopup(html);
+    }
+    else {
+        layer.bindPopup("No properties found");
+    }
+}
+
+function pointToLayer(feature, latlng, styleClass) {
+
+    const fontAwesomeIcon = L.divIcon({
+        html: '<i class="fa-solid fa-location-dot fa-2xl"></i>',
+        iconSize: [20, 20],
+        className: styleClass
+    });
+
+    let marker = L.marker(latlng, { icon: fontAwesomeIcon })
+    marker.feature = feature;
+    marker.styleClass = styleClass;
+
+    return marker;
+};
+
+var addPoiMarker = function (markers, poiMarker) {
+
+    // var propertiesString = "<pre>" + JSON.stringify(poiMarker.feature.properties, null, ' ').replace(/[\{\}"]/g, '') + "</pre>";
+
+    let company_name = poiMarker.feature.properties[property_company];
+    // delete poiMarker.feature.properties[property_company];
+
+    let street = poiMarker.feature.properties[property_street];
+    delete poiMarker.feature.properties[property_street];
+
+    let city = poiMarker.feature.properties[property_city];
+    delete poiMarker.feature.properties[property_city];
+
+    let postcode = poiMarker.feature.properties[property_postcode];
+    delete poiMarker.feature.properties[property_postcode];
+
+    let adressValue = street + ", " + postcode + ", " + city;
+    poiMarker.feature.properties[property_address] = adressValue;
+
+    let moodlePageIdValue = poiMarker.feature[moodlePageId];
+    if (moodlePageIdValue && moodlePageIdValue != "") {
+        poiMarker.feature.properties[moodlePageId_label] = "<a target='_blank' rel='noreferrer noopener' href=" + moodlePageId_baseUrl + moodlePageIdValue + ">" + moodlePageId_baseUrl + moodlePageIdValue + "</a>";
+    }
+
+    var popupContent = '<div class="featurePropertyPopupContent"><table class="table table-condensed">';
+    for (var p in poiMarker.feature.properties) {
+        popupContent += '<tr><td><b>' + p + '</b></td><td>' + poiMarker.feature.properties[p] + '</td></tr>';
+    }
+    popupContent += '</table></div>';
+
+    poiMarker.bindPopup("<b><i>" + company_name + "</i></b>" + "<br><br>" + popupContent);
+
+    markers.addLayer(poiMarker);
+
+    return markers;
+};
+
+function addLeafletOverlay(geoJSON, title, styleClass) {
+    if (map && layerControl) {
+
+
+        var markers;
+        if (useCluster) {
+            markers = L.markerClusterGroup({
+                iconCreateFunction: function (cluster) {
+                    var childCount = cluster.getChildCount();
+
+                    var c = 'marker-cluster-';
+                    if (childCount < 5) {
+                        c += 'small';
+                    } else if (childCount < 10) {
+                        c += 'medium';
+                    } else {
+                        c += 'large';
+                    }
+
+                    var className = "marker-cluster " + c + " bg-" + styleClass;
+
+                    //'marker-cluster' + c + ' ' +
+                    return new L.DivIcon({ html: '<div class="bg-' + styleClass + '" ><span>' + childCount + '</span></div>', className: className, iconSize: new L.Point(40, 40) });
+                }
+            });
+        }
+        else {
+            markers = L.layerGroup();
+        }
+
+        geoJSON.features.forEach(function (poiFeature) {
+            // index 0 should be longitude and index 1 should be latitude
+            //.bindPopup( poiFeature.properties.name )
+            let latLng = [poiFeature.geometry.coordinates[1], poiFeature.geometry.coordinates[0]];
+            var newMarker = pointToLayer(poiFeature, latLng, styleClass)
+
+            markers = addPoiMarker(markers, newMarker);
+        });
+
+        markers.addTo(map);
+        layerControl.addOverlay(markers, title);
+        overlayLayersArray.push(markers);
+    }
+}
+
+
+function loadLayers(geoJSON) {
+    let geoJSON_surveilling = JSON.parse(JSON.stringify(geoJSON));
+    let geoJSON_geoinformatics = JSON.parse(JSON.stringify(geoJSON));
+    let geoJSON_careerDay = JSON.parse(JSON.stringify(geoJSON));
+
+    let features_surveilling = geoJSON_surveilling.features.filter(feature => feature.label.study == study_surveilling);
+    let features_geoinformatics = geoJSON_geoinformatics.features.filter(feature => feature.label.study == study_geoinformatics);
+    let features_careerDay = geoJSON_careerDay.features.filter(feature => feature[moodlePageId] && feature[moodlePageId] != "");
+
+    geoJSON_surveilling.features = features_surveilling;
+    geoJSON_geoinformatics.features = features_geoinformatics;
+    geoJSON_careerDay.features = features_careerDay;
+
+    if (features_surveilling.length > 0) {
+        addLeafletOverlay(geoJSON_surveilling, label_layer_surveilling, style_class_surveilling);
+    }
+    if (features_geoinformatics.length > 0) {
+        addLeafletOverlay(geoJSON_geoinformatics, label_layer_geoinformatics, style_class_geoinformatics);
+    }
+    if (features_careerDay.length > 0) {
+        addLeafletOverlay(geoJSON_careerDay, label_layer_careerDay, style_class_careerDay);
+    }
+
+
+}
+
+function clearOverlays() {
+    for (const layer of overlayLayersArray) {
+        layerControl.removeLayer(layer);
+        map.removeLayer(layer);
+    }
+}
+
+function initOverlays() {
+    if (map && layerControl) {
+        // specify all overlay layers
+
+        clearOverlays();
+
+        fetch(linkToJsonFile)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+
+                loadLayers(data);
+            }
+            )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+    }
+}
+
+function initMap() {
+    // map = L.map(mapContainerNodeId).setView([51.461372, 7.2418863], 6);
+    map = L.map(mapContainerNodeId).setView([51.3149725, 9.3905754], 6);
+
+    initControls();
+
+    initBackgroundLayers();
+
+    initOverlays();
+
+    updateSearchControl();
+}
+
+function toggleClusterDisplay(event) {
+    let clusterSwitch = document.getElementById(clusterToggleSwitchId);
+
+    if (clusterSwitch.checked === true || clusterSwitch.checked === 'checked') {
+        useCluster = true;
+    }
+    else {
+        useCluster = false;
+    }
+
+    initOverlays();
+}
+
+function initClusterSwitch() {
+    let clusterSwitch = document.getElementById(clusterToggleSwitchId);
+    clusterSwitch.checked = true;
+    clusterSwitch.checked = "checked";
+
+    clusterSwitch.addEventListener("change", toggleClusterDisplay);
+}
+
+function onDomLoaded() {
+    initMap();
+
+    initClusterSwitch();
+}
+
+document.addEventListener("DOMContentLoaded", onDomLoaded);
+    </script>
+</body>
+
+</html>

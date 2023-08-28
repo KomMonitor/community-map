@@ -1,0 +1,25 @@
+{
+  "name": "KomMonitor community-map",
+  "private": true,
+  "version": "0.0.1",
+  "description": "A simple Leaflet-based map application showing avtive KomMonitor members and contact information",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "license": "Apache 2.0",
+  "devDependencies": {
+    "http-server": "^14.1.0",
+    "jshint": "^2.13.6"
+  },
+  "scripts": {
+    "start": "http-server -p 8000 -c-1 ./app --cors --gzip"
+  },
+  "dependencies": {
+  },
+  "jshintConfig": {
+    "undef": true,
+    "unused": false,
+    "esversion": 9
+  }
+}
