@@ -1,5 +1,5 @@
 var mapContainerNodeId = "mapContainer";
-var linkToJsonFile = "./resources/kreise.json";
+var linkToJsonFile = "./app/resources/kreise.json";
 
 const layerName_kreise = "Alle Kreise und kreisfreie Städte NRW";
 const layerName_kreise_activeMembers = "KomMonitor Kreise und kreisfreie Städte NRW";
