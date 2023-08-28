@@ -121,6 +121,7 @@ function addLeafletOverlay(geoJSON, title, styleColor, transparency) {
         overlayLayersArray.push(layer);
 
         map.fitBounds(layer.getBounds());
+        map.setMaxBounds(layer.getBounds());
     }
 }
 
@@ -174,7 +175,12 @@ function initOverlays() {
 
 function initMap() {
     // map = L.map(mapContainerNodeId).setView([51.461372, 7.2418863], 6);
-    map = L.map(mapContainerNodeId).setView([51.3149725, 9.3905754], 6);
+    map = L.map(mapContainerNodeId, {
+        center: [51.3149725, 7.3905754],
+        zoom: 8,
+        minZoom: 8,
+        maxZoom: 10,
+    });
 
     initControls();
 
