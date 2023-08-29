@@ -51,11 +51,16 @@ function initBackgroundLayers() {
 
         // start layer
 
+        var carto_positron_layer =
+                L.tileLayer('https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                    { attribution: 'CartoDB Positron' }).addTo(map);
+
         var osmLayer_tiled =
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                { attribution: 'OSMTiles' }).addTo(map);
+                { attribution: 'OSMTiles' });                
 
         // add baseLayers to Base Layers in layer control
+        layerControl.addBaseLayer(carto_positron_layer, "CartoDB Positron");
         layerControl.addBaseLayer(osmLayer_tiled, "Open Street Map");
     }
 }
