@@ -121,7 +121,7 @@ function addLeafletOverlay(geoJSON, title, styleColor, transparency) {
         overlayLayersArray.push(layer);
 
         map.fitBounds(layer.getBounds());
-        map.setMaxBounds(layer.getBounds());
+        // map.setMaxBounds(layer.getBounds());
     }
 }
 
